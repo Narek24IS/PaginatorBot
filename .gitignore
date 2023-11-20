@@ -1,0 +1,28 @@
+### venv template
+.Python
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+.venv
+pip-selfcheck.json
+.mypy_cache/
+venv/
+__pycache__/
+
+### dotenv template
+.env
+
+### idea
+.idea
+
+### test src
+test.py
+
+### users id
+CuteBotDB.db
+
+filtres/filtres.py
