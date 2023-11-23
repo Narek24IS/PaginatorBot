@@ -17,8 +17,6 @@ async def save_users_id(message: Message) -> list[int]:
     sender_id = message.from_user.id
     global users_id
 
-    print(f'{message.from_user.first_name}: {message.text}')
-
     if message.from_user.id not in users_id:
         print(f'Пользователь {message.from_user.username} сохранён')
         bot_database.user_interface.create_if_not_exists(sender_id, 0, None, list(), dict())

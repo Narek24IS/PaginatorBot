@@ -82,7 +82,7 @@ def create_books_edit_keyboard(*args: str) -> InlineKeyboardMarkup:
     # Наполняем клавиатуру кнопками-закладками в порядке возрастания
     for button in sorted(args):
         buttons.append(InlineKeyboardButton(
-            text=button,
+            text=INLINE_BUTTONS_RU.del_+button,
             callback_data=button+'#$%book#$%'+'del'
         ))
     # Добавляем в конец клавиатуры кнопку "Отменить"

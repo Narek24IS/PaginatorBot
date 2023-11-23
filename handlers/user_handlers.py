@@ -153,17 +153,34 @@ async def process_backward_press(callback: CallbackQuery):
 #=====================КНИГИ=====================#
 
 # Этот хэндлер будет срабатывать на нажатие инлайн-кнопки
+# с закладкой из списка закладок к удалению
+@router.callback_query(IsDelBookCallbackData())
+async def process_del_book_press(callback: CallbackQuery, del_book:str):
+    uid = callback.from_user.id
+    db.user_interface.remove_book(uid, del_book)
+    books = db.user_interface.get_books(uid)
+
+    if books:
+        await callback.message.edit_text(
+            text=INLINE_BUTTONS_RU.edit_books,
+            reply_markup=create_books_edit_keyboard(*books)
+        )
+    else:
+        await callback.message.edit_text(text=ANSWERS_RU.no_bookmarks)
+    await callback.answer()
+
+# Этот хэндлер будет срабатывать на нажатие инлайн-кнопки
 # с закладкой из списка закладок
 @router.callback_query(IsBookCallbackData())
 async def process_book_press(callback: CallbackQuery, user_book:str):
     uid = callback.from_user.id
-    db.user_interface.set_current_book(user_book)
+    db.user_interface.set_current_book(uid, user_book)
     db.user_interface.set_current_page(uid, 1)
     page = db.user_interface.get_current_page(uid)
     book = db.user_interface.get_current_book(uid)
     text = db.book_interface.get_page_content(book, page)
     page_num = db.book_interface.get_length(book)
-    await callback.answer(
+    await callback.message.answer(
         text=text,
         reply_markup=create_pagination_kb(page, page_num)
     )
@@ -182,23 +199,6 @@ async def process_books_edit_press(callback: CallbackQuery):
     )
     await callback.answer()
 
-
-# Этот хэндлер будет срабатывать на нажатие инлайн-кнопки
-# с закладкой из списка закладок к удалению
-@router.callback_query(IsDelBookCallbackData())
-async def process_del_book_press(callback: CallbackQuery, del_book:str):
-    uid = callback.from_user.id
-    db.user_interface.remove_book(uid, del_book)
-    books = db.user_interface.get_books(uid)
-
-    if books:
-        await callback.message.edit_text(
-            text=COMMANDS_RU.books.answer,
-            reply_markup=create_books_keyboard(*books)
-        )
-    else:
-        await callback.message.edit_text(text=ANSWERS_RU.no_bookmarks)
-    await callback.answer()
 
 @router.message(F.data == INLINE_BUTTONS_RU.edit_books_cancel)
 async def process_edit_books_cancel(callback: CallbackQuery):
