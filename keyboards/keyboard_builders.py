@@ -25,7 +25,7 @@ class Keyboard:
         return keyboard
 
 class InlineKeyboard:
-    def __init__(self, *buttons: str|InlineKeyboardButton, last_row:list[InlineKeyboardButton],
+    def __init__(self, *buttons: str|InlineKeyboardButton, last_row:list[InlineKeyboardButton]=[],
                  **data_text: str):
         self.buttons: list[InlineKeyboardButton] = []
         self.last_row = last_row

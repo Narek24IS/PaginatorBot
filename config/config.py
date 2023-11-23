@@ -19,7 +19,8 @@ class BotConfig:
 @dataclass
 class DatabaseConfig:
     database: str  # Название базы данных
-    db_host: str  # URL-адрес базы данных
+    db_host: str # URL-адрес базы данных
+    db_port: str # порт базы данных
     db_user: str  # Username пользователя базы данных
     db_password: str  # Пароль к базе данных
 
@@ -53,8 +54,9 @@ def load_config(path:str="") -> Config:
             admin_id=env.int('ADMIN_ID')
         ),
         db=DatabaseConfig(
-            database=env('DATABASE'),
+            database=env('DB_NAME'),
             db_host=env('DB_HOST'),
+            db_port=env('DB_PORT'),
             db_user=env('DB_USER'),
             db_password=env('DB_PASSWORD')
         )
@@ -64,5 +66,4 @@ def load_config(path:str="") -> Config:
 
 
 
-if __name__ == '__main__':
-    config = load_config()
+config = load_config()

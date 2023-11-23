@@ -8,24 +8,32 @@ ANSWERS_RU = ANSWER_LEXICON(
                  'добавить страницу в закладки - во время чтения '
                  'книги нажмите на кнопку с номером этой '
                  'страницы\n\n/continue - продолжить чтение',
-    cancel_text='/continue - продолжить чтение'
+    no_books='У вас пока нет ни одной книги.\n\nЧтобы '
+             'добавить книги для чтения просто отправьте книгу '
+             'в виду текстового файла',
+    cancel_text='/continue - продолжить чтение',
+    book_exist='Книга с таким именем уже существует, попробуйте переименовать файл'
 )
 
 INLINE_BUTTONS_RU = BUTTONS_LEXICON(
     forward='>>',
     backward='<<',
     edit_bookmarks='❌ РЕДАКТИРОВАТЬ',
-    cancel='ОТМЕНИТЬ',
+    edit_bookmarks_cancel='ОТМЕНИТЬ',
+    edit_books='❌РЕДАКТИРОВАТЬ',
+    edit_books_cancel=' ОТМЕНИТЬ',
     del_='❌'
 )
 
 start_command = COMMAND(
     command='start',
     description='Запустить бота',
-    answer='<b>Привет, читатель!</b>\n\nЭто бот, в котором '
-           'ты можешь прочитать книгу Рэя Брэдбери "Марсианские '
-           'хроники"\n\nЧтобы посмотреть список доступных '
-           'команд - набери /help',
+    answer='<b>Привет, читатель!</b>\n\n'
+           'Это бот, в котором ты можешь сохранять и читать книги\n\n'
+           'Чтобы посмотреть список доступных команд - набери /help\n\n'
+           'Чтобы добавить книгу, отправьте её в виде текстового файла в любой момент нашего '
+           'общения, если требуется задать имя отличное от имени файла, отправьте его в поле под файлом.\n\n'
+           'Чтобы сохранить закладку - нажмите на кнопку с номером страницы ',
 )
 
 help_command = COMMAND(
@@ -35,7 +43,10 @@ help_command = COMMAND(
            'перейти в начало книги\n/continue - продолжить '
            'чтение\n/bookmarks - посмотреть список закладок\n/help - '
            'справка по работе бота\n\nЧтобы сохранить закладку - '
-           'нажмите на кнопку с номером страницы\n\n<b>Приятного чтения!</b>',
+           'нажмите на кнопку с номером страницы\n\n'
+           'Чтобы добавить книгу, отправьте её в виде текстового файла в любой момент нашего '
+           'общения, если требуется задать имя отличное от имени файла, отправьте его в поле под файлом.\n\n'
+           '<b>Приятного чтения!</b>',
 )
 
 bookmarks_command = COMMAND(
@@ -56,13 +67,20 @@ continue_command = COMMAND(
     answer=''
 )
 
+books_command = COMMAND(
+    command='books',
+    description='Мои книги',
+    answer='Посмотреть загруженные книги'
+)
+
 COMMANDS_RU = COMMANDS_LEXICON(
     start=start_command,
     help=help_command,
     beginning=beginning_command,
     continue_=continue_command,
     bookmarks=bookmarks_command,
-    commands=[start_command, help_command, beginning_command, continue_command, bookmarks_command]
+    books=books_command,
+    commands=[beginning_command, continue_command, bookmarks_command, books_command, help_command]
 )
 
 __all__ = [ANSWERS_RU, INLINE_BUTTONS_RU, COMMANDS_RU]

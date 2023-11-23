@@ -8,16 +8,19 @@ class BUTTONS_LEXICON:
     backward: str
 
     edit_bookmarks: str
-    cancel:str
+    edit_bookmarks_cancel: str
+    edit_books: str
+    edit_books_cancel:str
     del_:str
 
 
 @dataclass
 class ANSWER_LEXICON:
     edit_bookmarks: str
-    del_: str
     no_bookmarks: str
+    no_books: str
     cancel_text: str
+    book_exist: str
 
 
 @dataclass
@@ -34,5 +37,6 @@ class COMMANDS_LEXICON:
     beginning: COMMAND
     continue_: COMMAND
     bookmarks: COMMAND
+    books: COMMAND
 
     commands:list[COMMAND]
