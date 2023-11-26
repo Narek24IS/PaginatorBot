@@ -40,7 +40,8 @@ class Book:
         page = text[start:current + 1]
         return page, len(page)
 
-    def _get_pretty_name(self, name: str) -> str:
+    @staticmethod
+    def _get_pretty_name(name: str) -> str:
         name = name.replace('.txt', '')
         pretty = re.sub(r'\W', '_', name.lower())
         pretty = re.sub(r'_+', '_', pretty)

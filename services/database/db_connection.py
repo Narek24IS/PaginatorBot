@@ -5,7 +5,6 @@ import psycopg2
 from psycopg2.extensions import connection
 
 from config.config import config
-from services.book import Book
 
 
 @dataclass
@@ -57,8 +56,8 @@ class UserInterface(BaseQueriesMixin):
         return book_name in self.get_books(user_id)
 
     def get_books(self, user_id: int) -> list:
-        query = ("SELECT name FROM books WHERE id = "
-                 "ANY(SELECT unnest(books) FROM users WHERE user_id = %s);")
+        query = ('SELECT name FROM books '
+                 'WHERE id in (SELECT unnest(books) FROM users WHERE user_id = %s);')
         values = (user_id,)
 
         with self.conn.cursor() as cursor:
@@ -81,7 +80,7 @@ class UserInterface(BaseQueriesMixin):
 
             return result2[0]
 
-    def _get_book_id_by_name(self, user_id: int, book_name: str) -> int:
+    def _get_book_id_by_name(self, book_name: str) -> int:
         query = "SELECT id FROM books WHERE name = %s;"
         values = (book_name,)
         result = self.get_row_by_query(query, values)
@@ -89,22 +88,30 @@ class UserInterface(BaseQueriesMixin):
         return book_id
 
     def remove_book(self, user_id: int, book_name: str) -> None:
-        book_id = self._get_book_id_by_name(user_id, book_name)
-        query = '''
+        book_id = self._get_book_id_by_name(book_name)
+        del_book_query = '''
         UPDATE users
          SET books = array_remove(books, %s),
              current_book = CASE WHEN current_book = %s THEN 1 ELSE current_book END
         WHERE user_id = %s;
         '''
         values = (book_id, book_id, user_id)
-        self.execute_query_and_commit(query, values)
+        self.execute_query_and_commit(del_book_query, values)
+        del_bookmarks_query = '''
+        UPDATE users
+         SET book_marks = book_marks - %s
+        WHERE user_id = %s;
+        '''
+        values = (book_name, user_id)
+        self.execute_query_and_commit(del_bookmarks_query, values)
 
-        query2 = "DELETE FROM books WHERE id = %s;"
-        values2 = (book_id,)
-        self.execute_query_and_commit(query2, values2)
+        if book_id > 5:
+            query2 = "DELETE FROM books WHERE id = %s;"
+            values2 = (book_id,)
+            self.execute_query_and_commit(query2, values2)
 
     def set_current_book(self, user_id: int, book_name: str) -> None:
-        book_id = self._get_book_id_by_name(user_id, book_name)
+        book_id = self._get_book_id_by_name(book_name)
         query = "UPDATE users SET current_book = %s WHERE user_id = %s;"
         values = (book_id, user_id)
         self.execute_query_and_commit(query, values)
@@ -141,7 +148,6 @@ class UserInterface(BaseQueriesMixin):
         if book_name in book_marks and book_mark in book_marks[book_name]:
             return
         book_marks.setdefault(book_name, []).append(book_mark)
-        print(f'Bookmarks -{book_marks}')
         self._save_book_marks(user_id, book_marks)
 
     def remove_book_mark(self, user_id: int, book_name: str, book_mark: int) -> None:
@@ -206,7 +212,7 @@ class Database(BaseQueriesMixin):
         with self.conn.cursor() as cursor:
             query = f"SELECT * FROM {table_name};"
             cursor.execute(query)
-            results: dict[int:tuple] = {x[0]:x[1:] for x in cursor.fetchall()}
+            results: dict[int:tuple] = {x[0]: x[1:] for x in cursor.fetchall()}
             return results
 
 

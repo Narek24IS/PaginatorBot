@@ -3,7 +3,11 @@ from lexicon.lexicon_classes import BUTTONS_LEXICON, ANSWER_LEXICON, COMMAND, CO
 # ---СОЗДАНИЕ ЭКЗЕМПЛЯРОВ--- #
 
 ANSWERS_RU = ANSWER_LEXICON(
-    edit_bookmarks='<b>Редактировать закладки</b>',
+    bookmarks_menu_title='<b>Это список ваших закладок:</b>',
+    bookmarks_edit_menu_title = '<b>Нажмите на закладку, чтобы удалить:</b>',
+    books_menu_title='<b>Это список ваших книг:</b>',
+    books_edit_menu_title = '<b>Нажмите на книгу, чтобы удалить:</b>',
+
     no_bookmarks='У вас пока нет ни одной закладки.\n\nЧтобы '
                  'добавить страницу в закладки - во время чтения '
                  'книги нажмите на кнопку с номером этой '
@@ -11,6 +15,7 @@ ANSWERS_RU = ANSWER_LEXICON(
     no_books='У вас пока нет ни одной книги.\n\nЧтобы '
              'добавить книги для чтения просто отправьте книгу '
              'в виду текстового файла',
+
     cancel_text='/continue - продолжить чтение',
     book_exist='Книга с таким именем уже существует, попробуйте переименовать файл'
 )
@@ -35,7 +40,7 @@ start_command = COMMAND(
            'общения, если требуется задать имя отличное от имени файла, отправьте его в поле под файлом.\n\n'
            'Чтобы сохранить закладку - нажмите на кнопку с номером страницы.\n\n'
            'Мы уже добавили несколько книг в твою библиотеку, чтобы ты мог проверить функционал бота\n'
-           'Для просмотра списка доступных книг - введи команду /books',
+           'Для просмотра списка доступных книг - введите команду /books',
 )
 
 help_command = COMMAND(
@@ -54,7 +59,7 @@ help_command = COMMAND(
 bookmarks_command = COMMAND(
     command='bookmarks',
     description='Мои закладки',
-    answer='<b>Это список ваших закладок:</b>',
+    answer=ANSWERS_RU.bookmarks_menu_title,
 )
 
 beginning_command = COMMAND(
@@ -72,7 +77,7 @@ continue_command = COMMAND(
 books_command = COMMAND(
     command='books',
     description='Мои книги',
-    answer='Посмотреть загруженные книги'
+    answer=ANSWERS_RU.books_menu_title
 )
 
 COMMANDS_RU = COMMANDS_LEXICON(
