@@ -15,7 +15,6 @@ from services.book import Book
 # Инициализация глобальных объектов
 config: Config = load_config()
 router = Router()
-users_id = load_users_id()
 
 #=====================КОМАНДЫ=====================#
 
@@ -25,8 +24,7 @@ users_id = load_users_id()
 @router.message(CommandStart())
 async def process_start_command(message: Message):
     await message.answer(COMMANDS_RU.start.answer)
-    if message.from_user.id not in users_id:
-        await save_users_id(message)
+    await save_users_id(message)
 
 # Этот хэндлер будет срабатывать на команду "/help"
 # и отправлять пользователю сообщение со списком доступных команд в боте

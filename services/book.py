@@ -5,36 +5,39 @@ from aiogram.types import Document
 
 from config.config import config
 
+
 class Book:
-    def __init__(self, file:Document, page_size=800):
-        # self.title = path.split('/')[-1].split('.')[0]
-        # self.path = os.path.join(sys.path[0], os.path.normpath(path))
-        self.title = self._get_pretty_name(file.file_name)
-        self.file_id = file.file_id
+    def __init__(self, file: Document | None = None, text:str | None = None, page_size=800):
         self.__page_size = page_size
+        if file:
+            self.title = self._get_pretty_name(file.file_name)
+            self.file_id = file.file_id
+            self.text = self._get_file_text_from_server()
+        elif text:
+            self.text = text
+        else:
+            raise ValueError
 
         self.book: dict[int, str] = {}
 
         self._prepare_book()
 
-
     @staticmethod
     def _get_part_text(text: str, start: int, size: int) -> tuple[str, int]:
-        end = min(start+size, len(text))
-        current:int
+        chars = '.,:;!?'
+        end = min(start+ size, len(text))
+
         if end == len(text):
-            page = text[start:end]
+            page = text[start:end+1]
             return page, len(page)
 
-        for current in range(end-1, start, -1):
-            if text[current] in '.,:;!?':
-                if text[current + 1] != '.':
-                    a = text[current]
-                    break
+        for current in range(end - 1, start, -1):
+            if text[current] in chars and text[current+1] not in chars:
+                break
         else:
             current = end
 
-        page = text[start:current+1]
+        page = text[start:current + 1]
         return page, len(page)
 
     def _get_pretty_name(self, name: str) -> str:
@@ -53,11 +56,12 @@ class Book:
         return response.text
 
     def _prepare_book(self) -> None:
-        text = self._get_file_text_from_server()
+        while '\n\n' in self.text:
+            self.text = self.text.replace('\n\n', '\n')
         current = 0
         page_num = 1
-        while current < len(text)-1:
-            page, size = self._get_part_text(text, current, self.__page_size)
+        while current < len(self.text) - 1:
+            page, size = self._get_part_text(self.text, current, self.__page_size)
             self.book[page_num] = page.lstrip()
             current += size
             page_num += 1
@@ -65,13 +69,13 @@ class Book:
     def __len__(self):
         return len(self.book)
 
-    def __getitem__(self, key:int|str):
+    def __getitem__(self, key: int | str):
         if isinstance(key, str):
             if key.isdigit():
                 key = int(key)
         return self.book[key]
 
-    def __setitem__(self, key:int|str, value:str):
+    def __setitem__(self, key: int | str, value: str):
         if isinstance(key, str):
             if key.isdigit():
                 key = int(key)
