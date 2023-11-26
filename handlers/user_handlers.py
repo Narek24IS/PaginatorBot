@@ -31,12 +31,15 @@ async def process_start_command(message: Message):
 @router.message(Command(commands=COMMANDS_RU.help.command))
 async def process_help_command(message: Message):
     await message.answer(COMMANDS_RU.help.answer)
+    await save_users_id(message)
 
 # Этот хэндлер будет срабатывать на команду "/beginning"
 # и отправлять пользователю первую страницу книги с кнопками пагинации
 @router.message(Command(commands=COMMANDS_RU.beginning.command))
 async def process_beginning_command(message: Message):
     uid = message.from_user.id
+    await save_users_id(message)
+
     if db.user_interface.get_books(uid):
         db.user_interface.set_current_page(uid, 1)
         page = db.user_interface.get_current_page(uid)
@@ -57,6 +60,8 @@ async def process_beginning_command(message: Message):
 @router.message(Command(commands=COMMANDS_RU.continue_.command))
 async def process_continue_command(message: Message):
     uid = message.from_user.id
+    await save_users_id(message)
+
     if db.user_interface.get_current_book(uid):
         page = db.user_interface.get_current_page(uid)
         book = db.user_interface.get_current_book(uid)
@@ -79,6 +84,7 @@ async def process_bookmarks_command(message: Message):
     uid = message.from_user.id
     book = db.user_interface.get_current_book(uid)
     bookmarks = db.user_interface.get_book_marks(uid).get(book)
+    await save_users_id(message)
 
 
     if bookmarks:
@@ -95,9 +101,8 @@ async def process_bookmarks_command(message: Message):
 @router.message(Command(commands=COMMANDS_RU.books.command))
 async def process_books_command(message: Message):
     uid = message.from_user.id
-    # page = db.user_interface.get_current_page(uid)
-    # book = db.user_interface.get_current_book(uid)
     books = db.user_interface.get_books(uid)
+    await save_users_id(message)
 
     if books:
         await message.answer(
@@ -213,6 +218,8 @@ async def process_edit_books_cancel(callback: CallbackQuery):
 
 @router.message(F.document)
 async def process_load_book(message: Message):
+    await save_users_id(message)
+
     if message.document.mime_type == 'text/plain':
         book = Book(message.document)
         book_name = message.caption if message.caption else book.title
