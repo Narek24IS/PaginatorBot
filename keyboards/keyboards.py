@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardMarkup
 from keyboards.keyboard_builders import InlineKeyboard
 from lexicon.lexicon import INLINE_BUTTONS_RU
 from services.database.db_connection import bot_database as db
-from callback_factories.edit_menu import BookCallbackFactory, BookmarksCallbackFactory
+from callback_factories.edit_menu import BookCF, BookmarksCF, BookMenuButtonCF, BookmarkMenuButtonCF
 
 
 def create_pagination_kb(page_number, total_pages) -> InlineKeyboardMarkup:
@@ -23,14 +23,14 @@ def create_bookmarks_keyboard(bookmarks: dict[str:list[int]]) -> InlineKeyboardM
             for page_num in pages:
                 buttons.append(InlineKeyboardButton(
                     text=f'{book_name}: {page_num} - {book[str(page_num)][:100]}',
-                    callback_data=BookmarksCallbackFactory(book_name=book_name,
-                                                           page_num=page_num, choose=True).pack()
+                    callback_data=BookmarksCF(book_name=book_name,
+                                              page_num=page_num, choose=True).pack()
                 ))
-    # Добавляем в клавиатуру в конце две кнопки "Редактировать"
+    # Добавляем в клавиатуру в конце кнопку "Редактировать"
     last_row = [
         InlineKeyboardButton(
             text=INLINE_BUTTONS_RU.edit_bookmarks,
-            callback_data=INLINE_BUTTONS_RU.edit_bookmarks
+            callback_data=BookmarkMenuButtonCF(edit=True).pack()
         )]
     return InlineKeyboard(*buttons, last_row=last_row)(1)
 
@@ -44,14 +44,14 @@ def create_bookmarks_edit_keyboard(bookmarks: dict[str:list[int]]) -> InlineKeyb
         for page_num in pages:
             buttons.append(InlineKeyboardButton(
                 text=f'{INLINE_BUTTONS_RU.del_}{book_name}: {page_num} - {book[str(page_num)][:100]}',
-                callback_data=BookmarksCallbackFactory(book_name=book_name,
-                                                       page_num=page_num, delete=True).pack()
+                callback_data=BookmarksCF(book_name=book_name,
+                                          page_num=page_num, delete=True).pack()
             ))
     # Добавляем в конец клавиатуры кнопку "Отменить"
     last_row = [
         InlineKeyboardButton(
             text=INLINE_BUTTONS_RU.edit_bookmarks_cancel,
-            callback_data=INLINE_BUTTONS_RU.edit_bookmarks_cancel
+            callback_data=BookmarkMenuButtonCF(cancel=True).pack()
         )]
 
     return InlineKeyboard(*buttons, last_row=last_row)(1)
@@ -64,14 +64,15 @@ def create_books_keyboard(*args: str) -> InlineKeyboardMarkup:
     for book_name in sorted(args):
         buttons.append(InlineKeyboardButton(
             text=book_name,
-            callback_data=BookCallbackFactory(book_name=book_name, choose=True).pack()
+            callback_data=BookCF(book_name=book_name, choose=True).pack()
         ))
     # Добавляем в клавиатуру в конце две кнопки "Редактировать" и "Отменить"
     last_row = [
         InlineKeyboardButton(
             text=INLINE_BUTTONS_RU.edit_books,
-            callback_data=INLINE_BUTTONS_RU.edit_books
+            callback_data=BookMenuButtonCF(edit=True).pack()
         )]
+
     return InlineKeyboard(*buttons, last_row=last_row)(1)
 
 
@@ -82,13 +83,13 @@ def create_books_edit_keyboard(*args: str) -> InlineKeyboardMarkup:
     for book_name in sorted(args):
         buttons.append(InlineKeyboardButton(
             text=INLINE_BUTTONS_RU.del_ + book_name,
-            callback_data=BookCallbackFactory(book_name=book_name, delete=True).pack()
+            callback_data=BookCF(book_name=book_name, delete=True).pack()
         ))
     # Добавляем в конец клавиатуры кнопку "Отменить"
     last_row = [
         InlineKeyboardButton(
             text=INLINE_BUTTONS_RU.edit_books_cancel,
-            callback_data=INLINE_BUTTONS_RU.edit_books_cancel
+            callback_data=BookMenuButtonCF(cancel=True).pack()
         )]
 
     return InlineKeyboard(*buttons, last_row=last_row)(1)

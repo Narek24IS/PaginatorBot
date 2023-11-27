@@ -127,6 +127,17 @@ class UserInterface(BaseQueriesMixin):
         values = (page, user_id)
         self.execute_query_and_commit(query, values)
 
+    def get_last_bot_message_id(self, user_id: int) -> int:
+        query = "SELECT last_bot_message_id FROM users WHERE user_id = %s;"
+        values = (user_id,)
+        result = self.get_row_by_query(query, values)
+        return result[0]
+
+    def set_last_bot_message_id(self, user_id: int, last_bot_message_id:int) -> None:
+        query = "UPDATE users SET last_bot_message_id = %s WHERE user_id = %s;"
+        values = (last_bot_message_id, user_id)
+        self.execute_query_and_commit(query, values)
+
     def get_book_marks(self, user_id: int) -> dict:
         query = "SELECT book_marks FROM users WHERE user_id = %s;"
         values = (user_id,)

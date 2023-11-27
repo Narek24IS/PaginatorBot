@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users
     current_page integer,
     books integer[],
     book_marks jsonb,
+    last_bot_message_id integer,
     CONSTRAINT fk_users_current_book FOREIGN KEY (current_book) REFERENCES books (id)
     ON DELETE CASCADE 
     ON UPDATE CASCADE 

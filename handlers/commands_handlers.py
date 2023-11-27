@@ -23,11 +23,11 @@ last_bot_message_id: int = 0
 # и отправлять ему приветственное сообщение
 @router.message(CommandStart())
 async def process_start_command(message: Message, bot: Bot):
+    uid = message.from_user.id
     msg = await message.answer(COMMANDS_RU.start.answer)
     await save_users_id(message)
-
-    global last_bot_message_id
-    last_bot_message_id = await delete_prev_messages(bot, msg, message)
+    await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    db.user_interface.set_last_bot_message_id(uid, msg.message_id)
 
 
 # Этот хэндлер будет срабатывать на команду "/help"
@@ -36,8 +36,7 @@ async def process_start_command(message: Message, bot: Bot):
 async def process_help_command(message: Message, bot: Bot):
     msg = await message.answer(COMMANDS_RU.help.answer)
     await save_users_id(message)
-    global last_bot_message_id
-    last_bot_message_id = await delete_prev_messages(bot, msg, message, last_bot_message_id)
+    await delete_prev_messages(bot, msg, message)
 
 
 # Этот хэндлер будет срабатывать на команду "/beginning"
@@ -60,8 +59,7 @@ async def process_beginning_command(message: Message, bot: Bot):
     else:
         msg = await message.answer(text=ANSWERS_RU.no_books)
 
-    global last_bot_message_id
-    last_bot_message_id = await delete_prev_messages(bot, msg, message, last_bot_message_id)
+    await delete_prev_messages(bot, msg, message)
 
 
 # Этот хэндлер будет срабатывать на команду "/continue"
@@ -85,8 +83,7 @@ async def process_continue_command(message: Message, bot: Bot):
     else:
         msg = await message.answer(text=ANSWERS_RU.no_books)
 
-    global last_bot_message_id
-    last_bot_message_id = await delete_prev_messages(bot, msg, message, last_bot_message_id)
+    await delete_prev_messages(bot, msg, message)
 
 
 # Этот хэндлер будет срабатывать на команду "/bookmarks"
@@ -106,8 +103,7 @@ async def process_bookmarks_command(message: Message, bot: Bot):
     else:
         msg = await message.answer(text=ANSWERS_RU.no_bookmarks)
 
-    global last_bot_message_id
-    last_bot_message_id = await delete_prev_messages(bot, msg, message, last_bot_message_id)
+    await delete_prev_messages(bot, msg, message)
 
 
 # Этот хэндлер будет срабатывать на команду "/books"
@@ -127,8 +123,7 @@ async def process_books_command(message: Message, bot: Bot):
     else:
         msg = await message.answer(text=ANSWERS_RU.no_books)
 
-    global last_bot_message_id
-    last_bot_message_id = await delete_prev_messages(bot, msg, message, last_bot_message_id)
+    await delete_prev_messages(bot, msg, message)
 
 
 # Непредусмотренные сообщения

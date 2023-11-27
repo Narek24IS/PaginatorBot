@@ -1,13 +1,13 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 
-from filtres.filtres import IsBookmarkCallbackData, IsDigitCallbackData, IsDelBookmarkCallbackData
+from callback_factories.edit_menu import BookmarksCF, BookmarkMenuButtonCF
+from filtres.filtres import IsBookmarkCallbackData
 from keyboards.keyboards import (create_pagination_kb,
                                  create_bookmarks_keyboard,
                                  create_bookmarks_edit_keyboard)
-from lexicon.lexicon import COMMANDS_RU, ANSWERS_RU, INLINE_BUTTONS_RU
+from lexicon.lexicon import ANSWERS_RU, INLINE_BUTTONS_RU
 from services.database.db_connection import bot_database as db
-from callback_factories.edit_menu import BookmarksCallbackFactory
 
 router = Router()
 
@@ -26,8 +26,8 @@ async def process_page_press(callback: CallbackQuery):
 
 # Этот хэндлер будет срабатывать на нажатие инлайн-кнопки
 # с закладкой из списка закладок
-@router.callback_query(BookmarksCallbackFactory.filter(F.choose==True))
-async def process_bookmark_press(callback: CallbackQuery, callback_data: BookmarksCallbackFactory):
+@router.callback_query(BookmarksCF.filter(F.choose == True))
+async def process_bookmark_press(callback: CallbackQuery, callback_data: BookmarksCF):
     uid = callback.from_user.id
     book = callback_data.book_name
     page_num = callback_data.page_num
@@ -43,8 +43,8 @@ async def process_bookmark_press(callback: CallbackQuery, callback_data: Bookmar
 
 # Этот хэндлер будет срабатывать на нажатие инлайн-кнопки
 # с закладкой из списка закладок к удалению
-@router.callback_query(BookmarksCallbackFactory.filter(F.delete==True))
-async def process_del_bookmark_press(callback: CallbackQuery, callback_data: BookmarksCallbackFactory):
+@router.callback_query(BookmarksCF.filter(F.delete == True))
+async def process_del_bookmark_press(callback: CallbackQuery, callback_data: BookmarksCF):
     uid = callback.from_user.id
     book = callback_data.book_name
     page_num = callback_data.page_num
@@ -63,7 +63,7 @@ async def process_del_bookmark_press(callback: CallbackQuery, callback_data: Boo
 
 # Этот хэндлер будет срабатывать на нажатие инлайн-кнопки
 # "редактировать" под списком закладок
-@router.callback_query(F.data == INLINE_BUTTONS_RU.edit_bookmarks)
+@router.callback_query(BookmarkMenuButtonCF.filter(F.edit==True))
 async def process_bookmarks_edit_press(callback: CallbackQuery):
     uid = callback.from_user.id
     bookmarks = db.user_interface.get_book_marks(uid)
@@ -77,8 +77,8 @@ async def process_bookmarks_edit_press(callback: CallbackQuery):
 
 # Этот хэндлер будет срабатывать на нажатие инлайн-кнопки
 # "Отменить" в меню редактирования списка закладок
-@router.callback_query(F.data == INLINE_BUTTONS_RU.edit_bookmarks_cancel)
-async def process_bookmarks_edit_press(callback: CallbackQuery):
+@router.callback_query(BookmarkMenuButtonCF.filter(F.cancel==True))
+async def process_edit_bookmarks_cancel(callback: CallbackQuery):
     uid = callback.from_user.id
     bookmarks = db.user_interface.get_book_marks(uid)
 

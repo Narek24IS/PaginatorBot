@@ -3,6 +3,7 @@ from aiogram.types import Message
 
 from config.config import load_config, Config
 from services.database.db_connection import bot_database
+from services.database.db_connection import bot_database as db
 
 config: Config = load_config()
 
@@ -24,10 +25,14 @@ async def save_users_id(message: Message) -> list[int]:
     return load_users_id()
 
 
-async def delete_prev_messages(bot: Bot, bot_message: Message, user_message: Message = None,
-                               last_bot_message_id: int = 0) -> int:
+async def delete_prev_messages(bot: Bot, bot_message: Message, user_message: Message = None):
+    uid = user_message.chat.id
+    user_message_id = user_message.message_id
+    chat_id = user_message.chat.id
+
+    bot_prev_message_id = db.user_interface.get_last_bot_message_id(uid)
+    await bot.delete_message(chat_id=chat_id, message_id=bot_prev_message_id)
+    db.user_interface.set_last_bot_message_id(uid, bot_message.message_id)
+
     if user_message:
-        await bot.delete_message(chat_id=user_message.chat.id, message_id=user_message.message_id)
-    if last_bot_message_id:
-        await bot.delete_message(chat_id=bot_message.chat.id, message_id=last_bot_message_id)
-    return bot_message.message_id
+        await bot.delete_message(chat_id=chat_id, message_id=user_message_id)
